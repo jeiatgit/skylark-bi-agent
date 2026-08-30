@@ -23,10 +23,23 @@ _CACHE = {
 
 def load_local_excel() -> Dict[str, Any]:
     """Fallback: Load and normalize datasets from local Excel files."""
-    base_dir = Path(__file__).resolve().parent.parent.parent
+    repo_root = Path(__file__).resolve().parent.parent
+    data_dir = repo_root / "data"
     
-    deal_file = base_dir / "Deal funnel Data.xlsx"
-    wo_file = base_dir / "Work_Order_Tracker Data.xlsx"
+    # Check data/ folder first, then repo_root, then parent
+    deal_file = data_dir / "Deal funnel Data.xlsx"
+    if not deal_file.exists():
+        deal_file = repo_root / "Deal funnel Data.xlsx"
+    if not deal_file.exists():
+        deal_file = repo_root.parent / "Deal funnel Data.xlsx"
+        
+    wo_file = data_dir / "Work_Order_Tracker Data.xlsx"
+    if not wo_file.exists():
+        wo_file = repo_root / "Work_Order_Tracker Data.xlsx"
+    if not wo_file.exists():
+        wo_file = repo_root.parent / "Work_Order_Tracker Data.xlsx"
+
+    print(f"[Analytics] Loading Excel data from: {deal_file.name} and {wo_file.name}")
     
     # Read sheets
     deals_raw = pd.read_excel(deal_file, sheet_name=0)
@@ -42,6 +55,7 @@ def load_local_excel() -> Dict[str, Any]:
     _CACHE["source"] = "Excel (Fast Boot / Fallback)"
     _CACHE["last_sync"] = pd.Timestamp.now().isoformat()
 
+    print(f"[Analytics] Successfully loaded {len(clean_deals)} deals, {len(clean_wos)} work orders.")
     return _CACHE
 
 
