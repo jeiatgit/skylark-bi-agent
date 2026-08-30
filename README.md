@@ -9,7 +9,7 @@
 
 | Resource | Link |
 |---|---|
-| **Public Hosted Application** | *[Provide your deployed Render / Vercel link here]* |
+| **Public Hosted Application** | [https://skylark-bi-agent-ppyp.onrender.com](https://skylark-bi-agent-ppyp.onrender.com) |
 | **GitHub Repository** | [https://github.com/jeiatgit/skylark-bi-agent](https://github.com/jeiatgit/skylark-bi-agent) |
 | **Submission Form** | [Official Google Form](https://forms.gle/qGihfi4zCLBxKWK68) |
 
@@ -142,7 +142,7 @@ Open **`http://localhost:3000`** in your browser.
 1. Connect your GitHub repository `https://github.com/jeiatgit/skylark-bi-agent` on [Render.com](https://render.com).
 2. Set **Runtime**: `Python`
 3. Set **Build Command**: `pip install -r requirements.txt`
-4. Set **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port 10000`
+4. Set **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 5. Add Environment Variables: `MONDAY_API_TOKEN`, `GEMINI_API_KEY`, `GEMINI_MODEL=gemini-flash-lite-latest`, `PORT=10000`.
 6. Click **Deploy** to obtain your public URL!
 
