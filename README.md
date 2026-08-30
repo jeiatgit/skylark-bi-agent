@@ -11,7 +11,6 @@
 |---|---|
 | **Public Hosted Application** | [https://skylark-bi-agent-ppyp.onrender.com](https://skylark-bi-agent-ppyp.onrender.com) |
 | **GitHub Repository** | [https://github.com/jeiatgit/skylark-bi-agent](https://github.com/jeiatgit/skylark-bi-agent) |
-| **Submission Form** | [Official Google Form](https://forms.gle/qGihfi4zCLBxKWK68) |
 
 ---
 
