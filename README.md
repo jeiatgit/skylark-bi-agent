@@ -1,7 +1,7 @@
 # 🚁 Skylark Drones — Monday.com Business Intelligence Agent
 
 > **An Autonomous, Tool-Calling Business Intelligence AI Agent for Skylark Drones**  
-> Answers executive-level questions across sales pipelines and operational work orders — pulling live data from **monday.com**, cleaning it deterministically, and synthesizing grounded, executive-grade business insights via **Google Gemini**.
+> Answers executive-level questions across sales pipelines and operational work orders — pulling live data from **monday.com**, cleaning it deterministically with **pandas**, and synthesizing grounded, executive-grade business insights via **FastAPI** and **Google Gemini**.
 
 ---
 
@@ -10,7 +10,7 @@
 | Resource | Link |
 |---|---|
 | **Public Hosted Application** | *[Provide your deployed Render / Vercel link here]* |
-| **GitHub Repository** | *[Provide your public GitHub repository link here]* |
+| **GitHub Repository** | [https://github.com/jeiatgit/skylark-bi-agent](https://github.com/jeiatgit/skylark-bi-agent) |
 | **Submission Form** | [Official Google Form](https://forms.gle/qGihfi4zCLBxKWK68) |
 
 ---
@@ -22,7 +22,7 @@ User Query (Chat UI)
         │
         ▼
 ┌────────────────────────────────────────────────────────┐
-│             AI Agent Query Router & Intent Engine      │
+│             FastAPI Backend (Python)                   │
 │                                                        │
 │  User Intent → [Intent Classifier & Parameter Router]  │
 │                           │                            │
@@ -34,17 +34,17 @@ User Query (Chat UI)
 │                    ▼                                   │
 │       [Dual-Source Data Adapter]                       │
 │        ├── Primary: monday.com GraphQL v2 API          │
-│        └── Fallback: In-Memory Local Dataset           │
+│        └── Fallback: In-Memory pandas Dataframe        │
 │                    │                                   │
 │                    ▼                                   │
-│       [Data Normalizer & Quality Guard]                │
+│       [pandas Normalizer & Quality Guard]              │
 │        ├── Filter leaked frozen header rows            │
 │        ├── Regex unit parser (HA, Acr, days, images)   │
 │        ├── Status typo standardizer (BIlled, Stuck)    │
 │        └── Date & Currency normalizer (₹, Cr, L)       │
 │                    │                                   │
 │                    ▼                                   │
-│       [Deterministic Analytics Engine]                 │
+│       [Deterministic Analytics Engine (pandas)]        │
 │        └── Zero-hallucination mathematical computation │
 │                    │                                   │
 │                    ▼                                   │
@@ -63,12 +63,11 @@ User Query (Chat UI)
 
 | Decision | Rationale |
 |---|---|
-| **Deterministic Math Engine** | **Zero LLM Hallucinations.** The AI agent never performs arithmetic on raw tables. Calculations (win rates, pipeline sums, aging receivables) are computed deterministically in code; the LLM only synthesizes the strategic narrative. |
+| **pandas for all math** | **Zero LLM Hallucinations.** The AI agent never performs arithmetic on raw tables. Calculations (win rates, pipeline sums, aging receivables) are computed deterministically with pandas; the LLM only synthesizes the strategic narrative. |
+| **FastAPI Backend** | High-performance async Python backend supporting typed Pydantic models, rapid response times, and native static file mounting for the Glassmorphism frontend. |
 | **Dual-Source Adapter Pattern** | Queries **monday.com GraphQL API** dynamically, with instant fallback to sanitized local datasets if board IDs are pending or rate limits occur — guaranteeing **zero downtime** during live evaluations. |
-| **Typed Function Calling (Tools)** | Replaces brittle prompt-stuffing. The agent dynamically picks from 5 specialized analytical tools based on user intent. |
 | **Data Quality Warning Badges** | Every query returns both calculated numbers and explicit **Data Quality Notices** (e.g., *"3 deals excluded due to missing close dates"*), ensuring executive transparency. |
 | **Multi-Model Resilience Cascade** | Automatically fails over across `gemini-flash-lite-latest`, `gemini-3.6-flash`, and `gemma-4-31b-it` to prevent 429 quota exhaustion. |
-| **Glassmorphism Executive UI** | Custom dark-mode interface with live KPI telemetry formatted in Indian Crores (`₹68.82 Cr`) and Lakhs (`₹77.07 L`), suggested query chips, and collapsible tool audit trails. |
 
 ---
 
@@ -97,89 +96,26 @@ The AI Agent is equipped with 5 specialized analytical tools:
 
 | Tool Name | Purpose | Key Parameters |
 |:---|:---|:---|
-| `query_deals` | Sales pipeline inquiries (value, win rate, stage/sector breakdowns, top opportunities) | `sector`, `dealStatus`, `dealStage`, `ownerCode`, `groupBy` |
-| `query_work_orders` | Operational & financial inquiries (receivables, billed vs. collected, delay counts) | `sector`, `executionStatus`, `invoiceStatus`, `billingStatus`, `groupBy` |
+| `query_deals` | Sales pipeline inquiries (value, win rate, stage/sector breakdowns, top opportunities) | `sector`, `deal_status`, `deal_stage`, `owner_code` |
+| `query_work_orders` | Operational & financial inquiries (receivables, billed vs. collected, delay counts) | `sector`, `execution_status`, `invoice_status` |
 | `cross_board_summary` | Cross-board correlation between sales pipeline and operational billing | `sector` |
 | `get_kpis` | Executive top-level KPI telemetry (Pipeline, Win Rate %, Receivables, Work Orders) | *None* |
 | `get_leadership_summary`| Comprehensive executive briefing covering pipeline health, operational delivery, and risks | *None* |
 
 ---
 
-## 📋 monday.com Board Setup & Recommended Schema
-
-### Step 1: Import Excel Files to monday.com
-1. In your monday.com workspace, click **+ Add** → **Import data** → **Excel**.
-2. Upload **`Deal funnel Data.xlsx`** → name the board **Skylark - Deal Funnel**.
-3. Upload **`Work_Order_Tracker Data.xlsx`** → name the board **Skylark - Work Orders**.
-
-### Step 2: Recommended Column Types
-
-#### Deal Funnel Board
-| Excel Column | monday.com Column Type | Description |
-|---|---|---|
-| `Deal Name` | **Name** | Deal identifier / account name |
-| `Owner code` | **Text** | Sales representative ID |
-| `Client Code` | **Text** | Customer account identifier |
-| `Deal Status` | **Status / Text** | Open / Won / Dead / On Hold |
-| `Close Date (A)` | **Date** | Actual close date |
-| `Closure Probability` | **Text / Status** | High / Medium / Low |
-| `Masked Deal value` | **Numbers** | Deal amount in INR |
-| `Tentative Close Date` | **Date** | Expected close date |
-| `Deal Stage` | **Text / Dropdown** | Funnel progression (A. Lead → G. Won) |
-| `Sector/service` | **Text / Dropdown** | Mining, Renewables, Powerline, etc. |
-
-#### Work Order Tracker Board
-| Excel Column | monday.com Column Type | Description |
-|---|---|---|
-| `Deal name masked` | **Name** | Project name |
-| `Customer Name Code` | **Text** | Client ID |
-| `Serial #` | **Text** | Deal reference (`SDPLDEAL-xxx`) |
-| `Execution Status` | **Status / Text** | Completed / Ongoing / Stuck |
-| `Sector` | **Text / Dropdown** | Industry vertical |
-| `Amount Incl GST` | **Numbers** | Total contracted value |
-| `Billed Value Incl GST`| **Numbers** | Invoiced value |
-| `Collected Amount` | **Numbers** | Cash collected |
-| `Amount Receivable` | **Numbers** | Outstanding balance |
-| `Quantity by Ops` | **Text** | Operational volume (`5360 HA`, etc.) |
-
----
-
-## 💬 Sample Questions Handled
-
-| Category | Example Executive Questions |
-|---|---|
-| **Pipeline & Sales** | • *"How is our pipeline looking for the Renewables and Mining sectors this quarter?"*<br>• *"Show me all open deals in Proposal or Negotiation stage."*<br>• *"What is our historical win rate?"* |
-| **Receivables & Billing** | • *"What is our total outstanding receivable, and which sector has the highest unpaid amount?"*<br>• *"What is our overall collection rate across all billed projects?"* |
-| **Operational Delays** | • *"Which work orders are currently stuck or delayed, and what is their contract value?"*<br>• *"How many active projects are currently ongoing in the Powerline sector?"* |
-| **Cross-Board Correlation** | • *"Compare our sales pipeline with actual billed revenue across all sectors."*<br>• *"Which sector has strong sales pipeline but low operational completion?"* |
-| **Leadership Briefings** | • *"Prepare a comprehensive leadership update for executive review."*<br>• *"What are our top financial and operational risks this week?"* |
-| **Ambiguity & Clarifications** | • *"How are we doing?"* → *Agent asks whether to focus on sales pipeline, operational delivery, or both.* |
-
----
-
-## 📈 Leadership Update Feature (Optional Requirement)
-
-When invoked (via query chip or asking *"Prepare a leadership update"*), the agent synthesizes an executive briefing structured into 4 pillars:
-
-1. **Revenue & Pipeline Telemetry:** Total active pipeline (`₹68.82 Cr`), win rate (`51%`), and highest opportunity sectors.
-2. **Operations & Billing Performance:** Total contract value (`₹24.97 Cr`), billed revenue (`₹12.67 Cr`), and cash collection efficiency (`71%`).
-3. **Concentration & Operational Risks:** Identifies stalled work orders (e.g. 4 stuck projects with `₹35.21 L` at risk) and single-account collection bottlenecks (`WOCOMPANY_010` with `₹1.03 Cr` pending).
-4. **Strategic Action Plan:** Provides 3 clear, prioritized recommendations for leadership focus.
-
----
-
-## 🚀 Local Development Setup
+## 🚀 Quickstart & Local Setup (Python)
 
 ### 1. Prerequisites
-- **Node.js LTS** (v18 or v20+)
+- **Python 3.10+**
 - **monday.com API Token**
 - **Google Gemini API Key** (from [Google AI Studio](https://aistudio.google.com/))
 
 ### 2. Installation
 ```bash
-git clone https://github.com/your-username/skylark-bi-agent.git
+git clone https://github.com/jeiatgit/skylark-bi-agent.git
 cd skylark-bi-agent
-npm install
+pip install -r requirements.txt
 ```
 
 ### 3. Configure Environment Variables
@@ -195,25 +131,23 @@ WORK_ORDERS_BOARD_ID=your_work_orders_board_id
 
 ### 4. Run Application
 ```bash
-npm start
+uvicorn app.main:app --host 0.0.0.0 --port 3000 --reload
 ```
 Open **`http://localhost:3000`** in your browser.
 
 ---
 
-## ⚙️ Environment Variables Reference
+## 🌐 Public Deployment Guide (Render.com)
 
-| Variable | Required | Description |
-|---|:---:|---|
-| `MONDAY_API_TOKEN` | ✅ | monday.com Personal API Token (v2) |
-| `GEMINI_API_KEY` | ✅ | Google AI Studio API key |
-| `GEMINI_MODEL` | ⬜ | Primary Gemini model name (default: `gemini-flash-lite-latest`) |
-| `DEALS_BOARD_ID` | ⬜ | Board ID for Deal Funnel on monday.com |
-| `WORK_ORDERS_BOARD_ID` | ⬜ | Board ID for Work Order Tracker on monday.com |
-| `PORT` | ⬜ | Server port (default: `3000` / `10000` on Render) |
+1. Connect your GitHub repository `https://github.com/jeiatgit/skylark-bi-agent` on [Render.com](https://render.com).
+2. Set **Runtime**: `Python`
+3. Set **Build Command**: `pip install -r requirements.txt`
+4. Set **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port 10000`
+5. Add Environment Variables: `MONDAY_API_TOKEN`, `GEMINI_API_KEY`, `GEMINI_MODEL=gemini-flash-lite-latest`, `PORT=10000`.
+6. Click **Deploy** to obtain your public URL!
 
 ---
 
 ## 👥 Author
 - **Candidate:** Jeiesh J S
-- **Role:** Full Stack Developer
+- **Role:** Full Stack Role

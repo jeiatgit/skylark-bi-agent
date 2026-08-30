@@ -1,6 +1,6 @@
 # Decision Log — Skylark Drones BI Agent
 
-**Candidate:** Jeiesh Jei  
+**Candidate:** Jeiesh J S  
 **Role:** Full Stack Developer  
 **Date:** August 30, 2026  
 **Document Limit:** Maximum 2 Pages  
@@ -23,10 +23,10 @@
 
 | Trade-off Dimension | Selected Approach | Alternative Considered | Rationale |
 |:---|:---|:---|:---|
-| **Calculation Engine** | **Deterministic Function-Calling** | Prompt-Stuffing (Raw Data to LLM) | Passing 500+ rows into prompt context causes hallucinated arithmetic, context truncation, and token wastage. Deterministic JS analytics tools guarantee 100% calculation accuracy. |
-| **Data Resiliency** | **Dual-Source Adapter Pattern** | Single Direct API Binding | The `cache.js` adapter queries monday.com GraphQL API dynamically, but transparently falls back to parsed local data if board IDs are pending or rate limits are hit, ensuring 0% downtime during executive demos. |
-| **AI Model** | **Gemini 3.6 Flash with Function Calling** | Raw Completion Models | Gemini 3.6 Flash provides sub-second latency for JSON function calls and high reasoning capacity for executive synthesis at zero cost on developer tiers. |
-| **Frontend Stack** | **Vanilla Glassmorphism UI (CSS/JS)** | Heavy React/Next.js Scaffold | Zero build-step overhead, instant startup, lightweight footprint, and total styling freedom to create a bespoke drone-aerospace dark glass aesthetic. |
+| **Calculation Engine** | **pandas DataFrame Aggregations** | Prompt-Stuffing (Raw Data to LLM) | Passing 500+ rows into prompt context causes hallucinated arithmetic, context truncation, and token wastage. Deterministic pandas analytics tools guarantee 100% calculation accuracy. |
+| **Data Resiliency** | **Dual-Source Adapter Pattern** | Single Direct API Binding | The `analytics.py` adapter queries monday.com GraphQL API dynamically, but transparently falls back to parsed local data if board IDs are pending or rate limits are hit, ensuring 0% downtime during executive demos. |
+| **Backend Framework** | **FastAPI (Python)** | Heavy Django / Flask Scaffolding | FastAPI provides asynchronous endpoint execution, native Pydantic typing, rapid serialization, and native static file serving for the Glassmorphism frontend. |
+| **AI Model** | **Gemini with Multi-Model Fallback** | Single Fragile Endpoint | Automatically cascades between `gemini-flash-lite-latest`, `gemini-3.6-flash`, and `gemma-4-31b-it` to maintain uninterrupted service during free-tier rate limits. |
 
 ---
 
@@ -35,7 +35,7 @@
 We interpreted "Leadership Updates" not as a static dashboard export, but as an **AI-driven strategic executive briefing**.
 
 When invoked (via query chip or conversational request *"Prepare a leadership update"*), the agent:
-1. **Aggregates Multi-Board Health:** Queries open pipeline value, win rate percentage, active work orders, and overall collection efficiency.
+1. **Aggregates Multi-Board Health:** Queries open pipeline value, win rate percentage, active work orders, and overall collection efficiency with pandas.
 2. **Identifies Concentration Risks:** Pinpoints single accounts with large uncollected balances (e.g., Renewables key accounts carrying >₹1.6 Cr pending).
 3. **Highlights Late-Stage Opportunities:** Surges top deals currently in Proposal or Negotiation stages requiring CXO sponsorship.
 4. **Delivers Actionable Takeaways:** Formulates 3 prioritized action items for executive review rather than raw data dumps.
@@ -45,6 +45,6 @@ When invoked (via query chip or conversational request *"Prepare a leadership up
 ## 4. What We Would Do Differently With Additional Time
 
 1. **Entity Resolution / Fuzzy Record Linkage:** Implement Jaro-Winkler or embedding-based semantic matching between `COMPANY_xxx` and `WOCOMPANY_xxx` codes to establish high-confidence entity resolution across historical boards.
-2. **Interactive Charting Components:** Integrate lightweight Chart.js or ECharts modules within chat bubble responses for dynamic funnel visualization and aging receivables scatter plots.
+2. **Interactive Charting Components:** Integrate lightweight Chart.js or Plotly modules within chat bubble responses for dynamic funnel visualization and aging receivables scatter plots.
 3. **Bidirectional Write-Back & Task Automation:** Provide agent capabilities with explicit confirmation modals to update monday.com item status columns (e.g., flagging an overdue work order as "Escalated to Leadership").
 4. **Multi-User RBAC & Saved Views:** Add authentication with role-based access control (e.g., Sales Rep view vs. CXO view) and persistent conversation session indexing via SQLite/PostgreSQL.
