@@ -95,11 +95,11 @@ const state = {
 // DOM Elements
 const chatMessages = document.getElementById('chatMessages');
 const chatForm = document.getElementById('chatForm');
-const userInput = document.getElementById('userInput');
+const userInput = document.getElementById('chatInput');
 const sendBtn = document.getElementById('sendBtn');
 const syncBtn = document.getElementById('syncBtn');
 const sourceText = document.getElementById('dataSourceLabel');
-const suggestedChips = document.getElementById('suggestedChips');
+const suggestedChips = document.querySelector('.suggested-chips');
 
 // KPI Elements
 const valPipeline = document.getElementById('kpiPipelineVal');
