@@ -98,19 +98,18 @@ const chatForm = document.getElementById('chatForm');
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const syncBtn = document.getElementById('syncBtn');
-const sourceBadge = document.getElementById('sourceBadge');
-const sourceText = document.getElementById('sourceText');
+const sourceText = document.getElementById('dataSourceLabel');
 const suggestedChips = document.getElementById('suggestedChips');
 
 // KPI Elements
-const valPipeline = document.getElementById('valPipeline');
-const subPipeline = document.getElementById('subPipeline');
-const valWinRate = document.getElementById('valWinRate');
-const subWinRate = document.getElementById('subWinRate');
-const valReceivables = document.getElementById('valReceivables');
-const subReceivables = document.getElementById('subReceivables');
-const valWorkOrders = document.getElementById('valWorkOrders');
-const subWorkOrders = document.getElementById('subWorkOrders');
+const valPipeline = document.getElementById('kpiPipelineVal');
+const subPipeline = document.getElementById('kpiPipelineSub');
+const valWinRate = document.getElementById('kpiWinRateVal');
+const subWinRate = document.getElementById('kpiWinRateSub');
+const valReceivables = document.getElementById('kpiReceivablesVal');
+const subReceivables = document.getElementById('kpiReceivablesSub');
+const valWorkOrders = document.getElementById('kpiWorkOrdersVal');
+const subWorkOrders = document.getElementById('kpiWorkOrdersSub');
 
 // Fetch and render KPIs
 async function loadKPIs() {
